@@ -1,11 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ChannelCreateDto;
+import com.example.demo.dto.ChannelResponseDto;
 import com.example.demo.entity.ChannelEntity;
-import com.example.demo.entity.UserEntity;
 import com.example.demo.exception.AppBadException;
+import com.example.demo.mapper.ChannelMapper;
 import com.example.demo.repository.ChannelRepository;
-import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,26 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
+    private final ChannelMapper CHANNEL_MAPPER;
 
     @Transactional
-    public ChannelEntity create(ChannelCreateDto dto) {
+    public ChannelResponseDto create(ChannelCreateDto dto) {
         // should be jwt current session ownerId
         Long ownerId = 5L;
-        UserEntity owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new AppBadException("User not found"));
-
         if (channelRepository.existsByOwnerId(ownerId)) {
             throw new AppBadException("User already has a channel");
         }
-
-        // Trim once and reuse
-        String customUrl = trimOrNull(dto.customUrl());
-
+        String customUrl = trimOrNull(dto.customUrl()); // Trim once and reuse
         if (customUrl != null && channelRepository.existsByCustomUrl(customUrl)) {
             throw new AppBadException("Custom URL already taken: " + customUrl);
         }
-
         ChannelEntity entity = ChannelEntity.builder()
                 .ownerId(ownerId)
                 .name(dto.name().trim())
@@ -43,20 +36,22 @@ public class ChannelService {
                 .bannerImageUrl(trimOrNull(dto.bannerImageUrl()))
                 .customUrl(customUrl)
                 .build();
-
-        return channelRepository.save(entity);
+        channelRepository.save(entity);
+        return CHANNEL_MAPPER.toChannelResponseDto(entity);
     }
 
     @Transactional(readOnly = true)
-    public ChannelEntity getById(Long id) {
-        return channelRepository.findById(id)
+    public ChannelResponseDto getById(Long id) {
+        ChannelEntity entity = channelRepository.findById(id)
                 .orElseThrow(() -> new AppBadException("Channel not found"));
+        return CHANNEL_MAPPER.toChannelResponseDto(entity);
     }
 
     @Transactional(readOnly = true)
-    public ChannelEntity getByOwnerId(Long ownerId) {
-        return channelRepository.findByOwnerId(ownerId)
+    public ChannelResponseDto getByOwnerId(Long ownerId) {
+        ChannelEntity entity = channelRepository.findByOwnerId(ownerId)
                 .orElseThrow(() -> new AppBadException("Channel not found for this user"));
+        return CHANNEL_MAPPER.toChannelResponseDto(entity);
     }
 
     @Transactional(readOnly = true)

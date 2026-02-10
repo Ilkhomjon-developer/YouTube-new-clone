@@ -13,7 +13,5 @@ public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
 
     boolean existsByCustomUrl(String customUrl);
 
-    Optional<ChannelEntity> findByCustomUrl(String customUrl);
-
     boolean existsByOwnerId(Long ownerId);
 }
