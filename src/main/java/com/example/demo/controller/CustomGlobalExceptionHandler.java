@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.exception.AppBadException;
+import com.example.demo.exception.EmailAlreadyExistsException;
+import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.exception.VerificationException;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +38,23 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(AppBadException.class)
     public ResponseEntity<String> handleAppBadException(AppBadException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        log.error("UserNotFoundException: {}", ex.getMessage());
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(VerificationException.class)
+    public ResponseEntity<String> handleVerificationException(VerificationException ex) {
+        log.error("VerificationException: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 

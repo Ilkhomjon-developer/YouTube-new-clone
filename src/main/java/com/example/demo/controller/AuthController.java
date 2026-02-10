@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ReqVerificationDto;
+import com.example.demo.dto.ResVerificationDto;
 import com.example.demo.dto.UserCreateDto;
 import com.example.demo.dto.UserShortInfoDto;
 import com.example.demo.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +21,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/create")
-    private ResponseEntity<UserShortInfoDto> createUser(@RequestBody UserCreateDto dto){
+    public ResponseEntity<UserShortInfoDto> createUser(@Valid @RequestBody UserCreateDto dto){
         return ResponseEntity.ok(authService.createUser(dto));
+    }
+
+    @PostMapping("/verification")
+    public ResponseEntity<ResVerificationDto> verification(@Valid @RequestBody ReqVerificationDto dto){
+        return ResponseEntity.ok(authService.verification(dto));
     }
 }
