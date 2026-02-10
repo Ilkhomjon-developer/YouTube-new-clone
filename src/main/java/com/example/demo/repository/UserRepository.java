@@ -13,8 +13,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 
-    boolean existsByEmail(String email);
-
     @Query("from UserEntity e where e.email = ?1 and e.isActive = true ")
     Optional<UserEntity> getUserStatus(String email);
 
